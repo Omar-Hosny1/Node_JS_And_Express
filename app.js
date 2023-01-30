@@ -1,22 +1,22 @@
-const http = require("http");
-
 const express = require("express");
 
 const app = express();
-app.use((req, res, next) => {
-  console.log("In the middle ware now");
-  next(); // continue to the next middleware
-});
-app.use((req, res, next) => {
-  console.log("In another middle ware");
-});
-// add a middleware function
-// the middleware will excute when every incoming request
 
-const server = http.createServer(app);
+app.use("/add-product", (req, res, next) => {
+  // add a middleware function
+  console.log("In another middle ware");
+  return res.send("<h1>Add Product Now</h1>");
+});
+
+app.use("/", (req, res, next) => {
+  // add a middleware function
+  console.log("In another middle ware");
+  return res.send("<h1>Hello from express</h1>");
+});
+// the middleware will excute when every incoming request
 
 const PORT = 3030;
 
-server.listen(PORT, function () {
+app.listen(PORT, function () {
   console.log(`server runnung on http://localhost:${PORT}`);
 });
