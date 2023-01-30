@@ -1,29 +1,26 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const path = require("path");
 
 const app = express();
+const adminRoutes = require("./routes/admin");
+const shopRoutes = require("./routes/shop");
 
 // it not parses the all data types but it can user for forms
 app.use(bodyParser.urlencoded({ extended: false })); // middleware that parse the body for the incoming requests
+app.use(express.static(path.join(__dirname, "public")));
 
-app.use("/add-product", (req, res, next) => {
-  return res.send(
-    "<form action='/product' method='POST'><input type='text' name='title' /><button type='submit'>Add Product</button></form>"
-  );
-});
+app.use("/admin", adminRoutes); // we can use the routes using app.use
 
-app.post("/product", (req, res, next) => {
-  console.log(req.body);
-  res.redirect("/");
-});
+app.use(shopRoutes);
 
-app.use("/", (req, res, next) => {
-  return res.send("<h1>Hello from express</h1>");
+app.use((req, res, next) => {
+  res.status(404).sendFile(path.join(__dirname, "views", "not-found.html"));
 });
-// the middleware will excute when every incoming request
 
 const PORT = 3030;
 
 app.listen(PORT, function () {
   console.log(`server runnung on http://localhost:${PORT}`);
 });
+//
