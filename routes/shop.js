@@ -5,8 +5,12 @@ const rootDir = require("../util/path");
 
 const routes = express.Router();
 
+const adminDate = require("./admin");
+
 routes.get("/", (req, res, next) => {
-  return res.sendFile(path.join(rootDir, "views", "shop.html"));
+  const products = adminDate.products;
+  res.render("shop", { prods: products, pageTitle: "Shop Page", path: "/" });
 });
 
 module.exports = routes;
+//npm install --save ejs pug express-handlebars
