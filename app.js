@@ -1,25 +1,27 @@
-const express = require("express");
-const bodyParser = require("body-parser");
 const path = require("path");
 
+const express = require("express");
+const bodyParser = require("body-parser");
+
 const app = express();
-app.set("view engine", "pug");
+
+app.set("view engine", "ejs");
 app.set("views", "views");
 
-const adminData = require("./routes/admin");
+const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
+
+const errorControllers = require("./controllers/error");
 
 // it not parses the all data types but it can user for forms
 app.use(bodyParser.urlencoded({ extended: false })); // middleware that parse the body for the incoming requests
 app.use(express.static(path.join(__dirname, "public")));
 
-app.use("/admin", adminData.routes); // we can use the routes using app.use
+app.use("/admin", adminRoutes); // we can use the routes using app.use
 
 app.use(shopRoutes);
 
-app.use((req, res, next) => {
-  res.status(404).render("404", { pageTitle: "Page Not Found" });
-});
+app.use(errorControllers.get404Page);
 
 const PORT = 3030;
 

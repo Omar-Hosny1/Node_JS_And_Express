@@ -1,16 +1,24 @@
 const express = require("express");
-const path = require("path");
-
-const rootDir = require("../util/path");
 
 const routes = express.Router();
 
-const adminDate = require("./admin");
+const shopControllers = require("../controllers/shop");
 
-routes.get("/", (req, res, next) => {
-  const products = adminDate.products;
-  res.render("shop", { prods: products, pageTitle: "Shop Page", path: "/" });
-});
+routes.get("/", shopControllers.getIndex);
+
+routes.get("/products", shopControllers.getProducts);
+
+routes.get("/products/:productId", shopControllers.getProduct);
+
+routes.get("/cart", shopControllers.getCart);
+
+routes.post("/cart", shopControllers.postCart);
+
+routes.post("/cart-delete-item", shopControllers.postCartDeleteProduct);
+
+routes.get("/checkout", shopControllers.getCheckOut);
+
+routes.get("/orders", shopControllers.getOrders);
 
 module.exports = routes;
 //npm install --save ejs pug express-handlebars
