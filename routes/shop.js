@@ -18,9 +18,9 @@ routes.post("/cart-delete-item", shopControllers.postCartDeleteProduct);
 
 routes.post("/create-order", shopControllers.postOrder);
 
-routes.get("/checkout", shopControllers.getCheckOut);
-
 routes.get("/orders", shopControllers.getOrders);
+
+// routes.get("/checkout", shopControllers.getCheckOut);
 
 module.exports = routes;
 //npm install --save ejs pug express-handlebars

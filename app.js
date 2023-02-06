@@ -3,13 +3,9 @@ const path = require("path");
 const express = require("express");
 const bodyParser = require("body-parser");
 
-const sequelize = require("./util/database");
-const Product = require("./models/product");
+const errorControllers = require("./controllers/error");
+const mongoConnect = require("./util/database").mongoConnect;
 const User = require("./models/user");
-const Cart = require("./models/cart");
-const CartItem = require("./models/cart-item");
-const Order = require("./models/order");
-const OrderItem = require("./models/order-item");
 
 const app = express();
 
@@ -19,16 +15,14 @@ app.set("views", "views");
 const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
 
-const errorControllers = require("./controllers/error");
-
 // it not parses the all data types but it can user for forms
 app.use(bodyParser.urlencoded({ extended: false })); // middleware that parse the body for the incoming requests
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use((req, res, next) => {
-  User.findByPk(1)
+  User.findById("63e0d260a331a062735a08d5")
     .then((user) => {
-      req.user = user;
+      req.user = new User(user.name, user.email, user.cart, user._id);
       next();
     })
     .catch((err) => {
@@ -44,36 +38,8 @@ app.use(errorControllers.get404Page);
 
 const PORT = 3030;
 
-Product.belongsTo(User, { constraints: true, onDelete: "CASCADE" });
-User.hasMany(Product);
-User.hasOne(Cart);
-Cart.belongsTo(User);
-Cart.belongsToMany(Product, { through: CartItem });
-Product.belongsToMany(Cart, { through: CartItem });
-Order.belongsTo(User);
-User.hasMany(Order);
-Order.belongsToMany(Product, { through: OrderItem });
-
-sequelize
-  // .sync({ force: true })
-  .sync()
-  .then((result) => {
-    return User.findByPk(1);
-  })
-  .then((user) => {
-    if (!user) {
-      return User.create({ name: "Omar", email: "test@test.com" });
-    }
-    return user;
-  })
-  .then((user) => {
-    return user.createCart();
-  })
-  .then((cart) => {
-    app.listen(PORT, function () {
-      console.log(`server runnung on http://localhost:${PORT}`);
-    });
-  })
-  .catch((err) => {
-    console.log(err);
+mongoConnect(() => {
+  app.listen(PORT, () => {
+    console.log(`server runnung on http://localhost:${PORT}`);
   });
+});
