@@ -13,14 +13,13 @@ exports.getAddProduct = (req, res, next) => {
 
 exports.postAddProduct = (req, res, next) => {
   const { title, price, description, imageUrl } = req.body;
-  const product = new Product(
+  const product = new Product({
     title,
     description,
     imageUrl,
     price,
-    null,
-    req.user._id
-  );
+    userId: req.user._id,
+  });
   product
     .save()
     .then((result) => {
@@ -33,8 +32,10 @@ exports.postAddProduct = (req, res, next) => {
 };
 
 exports.getProducts = (req, res, next) => {
-  Product.fetchAll()
+  Product.find()
+    //.populate("userId") // if u want to get all related data of the user not just the id use populate() or u can see (sec 13 lec 220)
     .then((products) => {
+      console.log(products);
       res.render("admin/products", {
         prods: products,
         pageTitle: "Admin Products",
@@ -74,15 +75,14 @@ exports.postEditProduct = (req, res, next) => {
   const updatedPrice = req.body.price;
   const updatedImageUrl = req.body.imageUrl;
   const updatedDesc = req.body.description;
-  const product = new Product(
-    updatedTitle,
-    updatedDesc,
-    updatedImageUrl,
-    updatedPrice,
-    new ObjectId(prodId)
-  );
-  product
-    .save()
+  Product.findById(prodId)
+    .then((product) => {
+      product.title = updatedTitle;
+      product.description = updatedDesc;
+      product.price = +updatedPrice;
+      product.imageUrl = updatedImageUrl;
+      return product.save();
+    })
     .then((result) => {
       console.log(result);
       res.redirect("/admin/products");
@@ -94,7 +94,7 @@ exports.postEditProduct = (req, res, next) => {
 
 exports.postDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
-  Product.deleteById(prodId)
+  Product.findByIdAndRemove(prodId)
     .then((result) => {
       res.redirect("/admin/products");
     })

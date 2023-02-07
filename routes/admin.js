@@ -7,9 +7,9 @@ const router = express.Router();
 // /admin/add-product
 router.get("/add-product", adminControllers.getAddProduct);
 
-// /admin/add-product
+// // /admin/add-product
 router.post("/add-product", adminControllers.postAddProduct);
-// the middleware will excute when every incoming request
+// // the middleware will excute when every incoming request
 
 router.get("/products", adminControllers.getProducts);
 
