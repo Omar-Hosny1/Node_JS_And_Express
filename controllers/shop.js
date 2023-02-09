@@ -9,6 +9,7 @@ exports.getProducts = (req, res, next) => {
         prods: products,
         pageTitle: "All Products",
         path: "/products",
+        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => {
@@ -33,6 +34,7 @@ exports.getIndex = (req, res, next) => {
         prods: products,
         pageTitle: "Shop Page",
         path: "/",
+        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => {
@@ -49,6 +51,7 @@ exports.getCart = (req, res, next) => {
         pageTitle: "Your Cart",
         path: "/cart",
         products: products.cart.items,
+        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => {
@@ -61,17 +64,19 @@ exports.getCheckOut = (req, res, next) => {
     res.render("shop/check-out", {
       path: "/checkout",
       pageTitle: "Checkout",
+      isAuthenticated: req.session.isLoggedIn,
     });
   });
 };
 
 exports.getOrders = (req, res, next) => {
-  Order.find({ "user.userId": req.user._id })
+  Order.find({ "user.userId": req.session.user._id })
     .then((orders) => {
       res.render("shop/orders", {
         path: "/orders",
         pageTitle: "Orders",
         orders,
+        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => console.log(err));
@@ -86,6 +91,7 @@ exports.getProduct = (req, res, next) => {
         product: product,
         pageTitle: product.title,
         path: "/products",
+        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => {
@@ -106,7 +112,7 @@ exports.postCart = (req, res, next) => {
 };
 
 exports.postOrder = (req, res, next) => {
-  req.user
+  req.session.user
     .populate("cart.items.productId")
     .then((result) => {
       console.log(result, "result");
@@ -115,13 +121,13 @@ exports.postOrder = (req, res, next) => {
       });
 
       const order = new Order({
-        user: { name: req.user.name, userId: req.user },
+        user: { name: req.session.user.name, userId: req.session.user },
         products: products,
       });
       return order.save();
     })
     .then((result) => {
-      return req.user.clearCart();
+      return req.session.user.clearCart();
     })
     .then((result) => {
       res.redirect("/orders");
