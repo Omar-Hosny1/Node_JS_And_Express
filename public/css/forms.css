@@ -9,6 +9,14 @@
   width: 100%;
   margin-bottom: 0.25rem;
 }
+.error-message {
+  margin: 0 auto;
+  padding: 10px;
+  text-align: center;
+  background-color: rgb(252, 155, 155);
+  color: red;
+  text-transform: uppercase;
+}
 
 .form-control input,
 .form-control textarea {

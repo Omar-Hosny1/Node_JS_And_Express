@@ -8,6 +8,8 @@ const User = require("./models/user");
 const mongoose = require("mongoose");
 const session = require("express-session");
 const MongodbStore = require("connect-mongodb-session")(session);
+const csrf = require("csurf");
+const flash = require("connect-flash");
 
 const MONGODB_URI =
   "mongodb+srv://NodeComplete:oyz2R8U6iOxFa2V4@nodecomplete.d175mol.mongodb.net/shop";
@@ -17,6 +19,7 @@ const store = new MongodbStore({
   uri: MONGODB_URI,
   collection: "sessions",
 });
+const csrfProtection = csrf();
 
 app.set("view engine", "ejs");
 app.set("views", "views");
@@ -36,6 +39,8 @@ app.use(
     store: store,
   })
 );
+app.use(csrfProtection);
+app.use(flash());
 
 app.use((req, res, next) => {
   if (!req.session.user) {
@@ -51,6 +56,13 @@ app.use((req, res, next) => {
     });
 });
 
+app.use((req, res, next) => {
+  // these two fields will be set for the views that will render
+  res.locals.csrfToken = req.csrfToken();
+  res.locals.isAuthenticated = req.session.isLoggedIn;
+  next();
+});
+
 app.use("/admin", adminRoutes); // we can use the routes using app.use
 app.use(shopRoutes);
 app.use(authRoutes);
@@ -59,17 +71,6 @@ app.use(errorControllers.get404Page);
 mongoose
   .connect(MONGODB_URI)
   .then((result) => {
-    User.findOne().then((user) => {
-      if (!user) {
-        const user = new User({
-          name: "omar",
-          email: "omar@point.com",
-          cart: { items: [] },
-        });
-        user.save();
-      }
-    });
-
     app.listen(3000, () => {
       console.log("http://localhost:3000");
     });

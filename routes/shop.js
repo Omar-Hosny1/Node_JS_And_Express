@@ -1,4 +1,5 @@
 const express = require("express");
+const isAuth = require("../middleware/is-auth");
 
 const routes = express.Router();
 
@@ -10,15 +11,15 @@ routes.get("/products", shopControllers.getProducts);
 
 routes.get("/products/:productId", shopControllers.getProduct);
 
-routes.get("/cart", shopControllers.getCart);
+routes.get("/cart", isAuth, shopControllers.getCart);
 
-routes.post("/cart", shopControllers.postCart);
+routes.post("/cart", isAuth, shopControllers.postCart);
 
-routes.post("/cart-delete-item", shopControllers.postCartDeleteProduct);
+routes.post("/cart-delete-item", isAuth, shopControllers.postCartDeleteProduct);
 
-routes.post("/create-order", shopControllers.postOrder);
+routes.post("/create-order", isAuth, shopControllers.postOrder);
 
-routes.get("/orders", shopControllers.getOrders);
+routes.get("/orders", isAuth, shopControllers.getOrders);
 
 module.exports = routes;
 //npm install --save ejs pug express-handlebars

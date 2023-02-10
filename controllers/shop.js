@@ -9,7 +9,6 @@ exports.getProducts = (req, res, next) => {
         prods: products,
         pageTitle: "All Products",
         path: "/products",
-        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => {
@@ -34,7 +33,6 @@ exports.getIndex = (req, res, next) => {
         prods: products,
         pageTitle: "Shop Page",
         path: "/",
-        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => {
@@ -51,7 +49,6 @@ exports.getCart = (req, res, next) => {
         pageTitle: "Your Cart",
         path: "/cart",
         products: products.cart.items,
-        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => {
@@ -64,7 +61,6 @@ exports.getCheckOut = (req, res, next) => {
     res.render("shop/check-out", {
       path: "/checkout",
       pageTitle: "Checkout",
-      isAuthenticated: req.session.isLoggedIn,
     });
   });
 };
@@ -76,7 +72,6 @@ exports.getOrders = (req, res, next) => {
         path: "/orders",
         pageTitle: "Orders",
         orders,
-        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => console.log(err));
@@ -91,7 +86,6 @@ exports.getProduct = (req, res, next) => {
         product: product,
         pageTitle: product.title,
         path: "/products",
-        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => {
@@ -112,7 +106,7 @@ exports.postCart = (req, res, next) => {
 };
 
 exports.postOrder = (req, res, next) => {
-  req.session.user
+  req.user
     .populate("cart.items.productId")
     .then((result) => {
       console.log(result, "result");
@@ -121,13 +115,13 @@ exports.postOrder = (req, res, next) => {
       });
 
       const order = new Order({
-        user: { name: req.session.user.name, userId: req.session.user },
+        user: { email: req.user.email, userId: req.session.user },
         products: products,
       });
       return order.save();
     })
     .then((result) => {
-      return req.session.user.clearCart();
+      return req.user.clearCart();
     })
     .then((result) => {
       res.redirect("/orders");
